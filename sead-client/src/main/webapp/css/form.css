@@ -1,0 +1,42 @@
+.status_hidden {
+    margin-top: 20px;
+    margin-left: 5px;
+    display: none;
+}
+
+.status_loading {
+    margin-top: 20px;
+    margin-left: 5px;
+    background-color: lightyellow;
+}
+
+.status_successful {
+    margin-top: 20px;
+    margin-left: 5px;
+    background-color: #e1ece1;
+}
+
+.status_error {
+    margin-top: 20px;
+    margin-left: 5px;
+    background-color: #fff0f0;
+}
+
+pre {
+    background-color: rgba(248, 248, 248, 0);
+    border: 1px solid rgba(192, 192, 192, 0);
+    padding-top: 0px;
+}
+
+.json-key {
+   color: black;
+}
+
+.json-value {
+   color: navy;
+}
+
+.json-string {
+   color: green;
+}
+
