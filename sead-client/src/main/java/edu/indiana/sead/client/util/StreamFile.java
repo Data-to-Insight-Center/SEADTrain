@@ -10,13 +10,15 @@ public class StreamFile {
     private String year;
     private String week;
     private String id;
+    private String mimeType;
 
-    public StreamFile(String filename, String filePath, String year, String week, String id) {
+    public StreamFile(String filename, String filePath, String year, String week, String id, String mimeType) {
         this.filename = filename;
         this.filePath = filePath;
         this.year = year;
         this.week = week;
         this.id = id;
+        this.mimeType = mimeType;
     }
 
     public String getFilename() {
@@ -57,6 +59,14 @@ public class StreamFile {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 
 }

@@ -34,6 +34,7 @@ public class Constants {
 	public static String clientDbName;
     public static String fedoraUrl;
     public static String curbeeUrl;
+    public static String seadClientUrl;
     public final static String INFINITE = "inf";
 
     public static Map<String, String> OREMetadataMap = new HashMap<String, String>();
@@ -64,6 +65,8 @@ public class Constants {
     public static final String AFFILIATIONS = "Affiliations";
     public static final String PREFERENCES = "Preferences";
     public static final String SIMILAR_TO = "similarTo";
+    public static final String PURPOSE = "Purpose";
+    public static final String PUBLICATION_CALLBACK = "Publication Callback";
 
     public static final String AGGREGATION_STATISTICS = "Aggregation Statistics";
     public static final String NUMBER_OF_DATASETS = "Number of Datasets";
@@ -93,6 +96,7 @@ public class Constants {
 		clientDbName = props.getProperty("client.db.name", "sead-client");
         fedoraUrl = props.getProperty("fedora.url", "http://localhost:8080/fed/rest");
         curbeeUrl = props.getProperty("curbee.url", "http://localhost:8083/sead-api/api/researchobjects");
+        seadClientUrl = props.getProperty("sead.client.url", "http://localhost:8083/sead-client/rest");
 	}
 
     private static void populateOREMapContext() {
@@ -136,6 +140,8 @@ public class Constants {
         roMetadataMap.put(REPOSITORY, "http://sead-data.net/terms/requestedrepository");
         roMetadataMap.put(AFFILIATIONS, "http://sead-data.net/terms/affiliations");
         roMetadataMap.put(PREFERENCES, "http://sead-data.net/terms/publicationpreferences");
+        roMetadataMap.put(PURPOSE, "http://sead-data.net/vocab/publishing#Purpose");
+        roMetadataMap.put(PUBLICATION_CALLBACK, "http://sead-data.net/terms/publicationcallback");
 
         roMetadataMap.put(AGGREGATION_STATISTICS, "http://sead-data.net/terms/publicationstatistics");
         roMetadataMap.put(TOTAL_SIZE, "tag:tupeloproject.org,2006:/2.0/files/length");

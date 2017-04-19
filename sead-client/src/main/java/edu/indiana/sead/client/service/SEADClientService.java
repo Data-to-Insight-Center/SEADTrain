@@ -24,6 +24,7 @@ import edu.indiana.sead.client.util.Constants;
 import edu.indiana.sead.client.util.MongoDB;
 import edu.indiana.sead.client.util.StreamFile;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.glassfish.jersey.media.multipart.MultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
@@ -46,11 +47,13 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 @Path("/")
 public class SEADClientService {
 
     private WebTarget fedoraWebService;
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+    private static Logger logger = Logger.getLogger(SEADClientService.class);
 
     //Stream RO constants
     public static final String FOLDER = "folder";
@@ -240,44 +243,62 @@ public class SEADClientService {
     public Response publishStreamRo(String roData) throws IOException {
 
         JSONObject metadataObject = new JSONObject(roData);
-
         String folder = metadataObject.getString(FOLDER);
         String project = metadataObject.getString(PROJECT);
-
         String id = project + "-" + UUID.randomUUID().toString();
-
-        Client client = ClientBuilder.newBuilder()
-                .register(MultiPartFeature.class).build();
+        Client client = ClientBuilder.newBuilder().register(MultiPartFeature.class).build();
 
         // Create folder in Fedora with id
         WebTarget fedoraWebService = ClientBuilder.newClient().target(Constants.fedoraUrl + "/" + project);
-        Response fedoraResponse = fedoraWebService.request().header("Slug", id).post(null);
+        Response fedoraResponse = null;
+        try {
+            fedoraResponse = fedoraWebService.request().header("Slug", id).post(null);
+        } catch (Exception e) {
+            logger.error("Couldn't create RO folder in Fedora repository", e);
+            return Response.serverError()
+                    .entity(new JSONObject().put("error", "Error occurred while connecting to Fedora repository").toString())
+                    .build();
+        }
 
-        WebTarget webTarget = client.target(Constants.fedoraUrl + "/" + project + "/" + id);
-        MultiPart multiPart = new MultiPart();
+        if (fedoraResponse.getStatus() != Response.Status.CREATED.getStatusCode()
+                && fedoraResponse.getStatus() != Response.Status.OK.getStatusCode()) {
+            logger.error("Couldn't create RO folder in Fedora repository");
+            return Response.serverError()
+                    .entity(new JSONObject().put("error", "Couldn't create RO folder in Fedora repository").toString())
+                    .build();
+        }
 
+        WebTarget webTarget = client.target(Constants.fedoraUrl + "/" + project + "/" + id); // folder of RO in fedora
         Iterator it = FileUtils.iterateFiles(new File(folder), null, false);
         ArrayList<StreamFile> fileList = new ArrayList<StreamFile>();
 
-        //first while should get file name list and add entries to DB
-        //second update file names to processing and should deposit and create oreMap
-        while(it.hasNext()) {
+        while (it.hasNext()) { // iterate through files
             File file = (File) it.next();
             String fileName = file.getName();
-
+            String mimeType = file.toURL().openConnection().getContentType();
+            // check format and .txt extension
             if (!fileName.split("\\/")[fileName.split("\\/").length - 1].endsWith(".txt") ||
                     !Pattern.matches(streamFileFormat, fileName.split("\\.")[0])) {
                 continue;
             }
-
             Pattern p = Pattern.compile(streamFileFormat);
             Matcher m = p.matcher(fileName.split("\\.")[0]);
             m.find();
-            StreamFile streamFile = new StreamFile(fileName, file.getAbsolutePath(), m.group(1), m.group(2), m.group(3));
+            StreamFile streamFile = new StreamFile(fileName, file.getAbsolutePath(), m.group(1), m.group(2),
+                    m.group(3), mimeType);
+            //add files to fileList
             fileList.add(streamFile);
+        }
+
+        for (StreamFile streamFile : fileList) {
+            File file = new File(streamFile.getFilePath());
+            File file_rename = new File(streamFile.getFilePath() + ".processing");
+            //rename file with .processing appended at the end
+            file.renameTo(file_rename);
+            streamFile.setFilePath(streamFile.getFilePath() + ".processing");
+            // add "Processing" status to DB
             MongoDB.addStreamStatus(project, streamFile.getYear(), streamFile.getWeek(), streamFile.getId(),
-                    new Date(), MongoDB.STATUS_ENUM.Processing);
-            //TODO updae file name to processing
+                    new Date(), id, MongoDB.STATUS_ENUM.Processing);
         }
 
         long totalSize = 0;
@@ -287,53 +308,71 @@ public class SEADClientService {
         ArrayList<String> mimeTypes = new ArrayList<String>();
         JSONArray filesArray = new JSONArray();
 
-        for(StreamFile streamFile : fileList) {
+        for (StreamFile streamFile : fileList) {
 
             File file = new File(streamFile.getFilePath());
-            System.out.println(streamFile.getFilename());
+            String fileName = streamFile.getFilename();
             long size = file.length();
-            String mimeType =  file.toURL().openConnection().getContentType();
+            String mimeType = streamFile.getMimeType();
             Date lastModified = new Date(file.toURL().openConnection().getLastModified());
 
             totalSize += size;
-            if(maxSize < size)
+            if (maxSize < size)
                 maxSize = size;
             noOfFiles++;
-            if(!mimeTypes.contains(mimeType))
+            if (!mimeTypes.contains(mimeType))
                 mimeTypes.add(mimeType);
 
-            FileDataBodyPart fileDataBodyPart = new FileDataBodyPart("file",
-                    file, MediaType.APPLICATION_OCTET_STREAM_TYPE);
-            multiPart.bodyPart(fileDataBodyPart);
-
+            // deposit file in fedora
             byte[] byateArray = Files.readAllBytes(file.toPath());
-
-            Response file_response = webTarget.request().header("Slug",streamFile.getFilename()).post(
-                    Entity.entity(byateArray, mimeType));
-
-            if(file_response.getStatus() != Response.Status.CREATED.getStatusCode()) {
-                //TODO remove processing tag to file
+            Response file_response = null;
+            try {
+                file_response = webTarget.request().header("Slug", fileName).post(
+                        Entity.entity(byateArray, mimeType));
+            } catch (Exception e) {
+                //remove .processing from file
+                File file_name = new File(streamFile.getFilePath());
+                File file_rename = new File(streamFile.getFilePath().replaceAll(".processing", ""));
+                file_name.renameTo(file_rename);
+                //add "NotDeposited" status to DB
                 MongoDB.addStreamStatus(project, streamFile.getYear(), streamFile.getWeek(), streamFile.getId(),
-                        new Date(), MongoDB.STATUS_ENUM.NotDeposited);
+                        new Date(), id, MongoDB.STATUS_ENUM.NotDeposited);
+                logger.error("File not deposited in fedora : " + fileName);
                 continue;
             }
+
+            if (file_response.getStatus() != Response.Status.CREATED.getStatusCode() &&
+                    file_response.getStatus() != Response.Status.OK.getStatusCode()) {
+                //remove .processing from file
+                File file_name = new File(streamFile.getFilePath());
+                File file_rename = new File(streamFile.getFilePath().replaceAll(".processing", ""));
+                file_name.renameTo(file_rename);
+                //add "NotDeposited" status to DB
+                MongoDB.addStreamStatus(project, streamFile.getYear(), streamFile.getWeek(), streamFile.getId(),
+                        new Date(), id, MongoDB.STATUS_ENUM.NotDeposited);
+                logger.error("File not deposited in fedora : " + fileName);
+                continue;
+            }
+            //add "Deposited" status to DB
             MongoDB.addStreamStatus(project, streamFile.getYear(), streamFile.getWeek(), streamFile.getId(),
-                    new Date(), MongoDB.STATUS_ENUM.Deposited);
-            // TODO retry to publish if publishing fails
+                    new Date(), id, MongoDB.STATUS_ENUM.Deposited);
 
-            String similarTo = Constants.fedoraUrl + "/" + project + "/" + id + "/" + streamFile.getFilename();
-
+            String similarTo = Constants.fedoraUrl + "/" + project + "/" + id + "/" + fileName;
             JSONObject fileObject = new JSONObject();
-            fileObject.put(Constants.TITLE,streamFile.getFilename());
-            fileObject.put(Constants.SIZE,size);
-            fileObject.put(Constants.MIMETYPE,mimeType);
-            fileObject.put(Constants.CREATION_DATE,lastModified);
-            fileObject.put(Constants.SIMILAR_TO,similarTo);
+            fileObject.put(Constants.TITLE, fileName);
+            fileObject.put(Constants.SIZE, size);
+            fileObject.put(Constants.MIMETYPE, mimeType);
+            fileObject.put(Constants.CREATION_DATE, lastModified);
+            fileObject.put(Constants.SIMILAR_TO, similarTo);
             filesArray.put(fileObject);
-
-            System.out.println(file_response.getStatus());
         }
 
+        if(filesArray.length() == 0) {
+            return Response.status(Response.Status.NO_CONTENT)
+                    .entity(new JSONObject().put("message", "There were no files to publish").toString()).build();
+        }
+
+        //populate metadata
         roMetadataObj.put(Constants.CREATOR, metadataObject.getString(CREATOR));
         roMetadataObj.put(Constants.TITLE, metadataObject.getString(ABSTRACT));
         roMetadataObj.put(Constants.ABSTRACT, metadataObject.getString(TITLE));
@@ -344,29 +383,62 @@ public class SEADClientService {
         roMetadataObj.put(Constants.MAX_COLLECTION_DEPTH, 0);
         roMetadataObj.put(Constants.TOTAL_SIZE, totalSize);
         roMetadataObj.put(Constants.NUMBER_OF_COLLECTIONS, 0);
-        roMetadataObj.put(Constants.DATA_MIMETYPE, new JSONArray(Arrays.asList(mimeTypes)));
+        roMetadataObj.put(Constants.DATA_MIMETYPE, new JSONArray(mimeTypes));
         roMetadataObj.put(FILES, filesArray);
 
-
+        //create and deposito OREMap in fedora
         JSONObject oreMap = createStreamOREMap(roMetadataObj, id);
         Response oreMap_response = webTarget.request().header("Slug", "oreMap").post(
                 Entity.entity(oreMap.toString().getBytes(), "application/json"));
+        //TODO handle error if failed
 
+        //create RO object
         JSONObject roObject = createStreamRO(roMetadataObj, id);
 
+        //send RO request to SEAD services
         Client curbeeClient = ClientBuilder.newClient();
         WebTarget curbeeTarget = curbeeClient.target(Constants.curbeeUrl);
-        Response curbeeResponse =
-                curbeeTarget.request(MediaType.APPLICATION_JSON)
-                        .post(Entity.entity(roObject.toString(), MediaType.APPLICATION_JSON));
+        Response curbeeResponse = null;
+        int status = 0;
+        String curbeeResponseString = new JSONObject().put("error", "Error while sending RO to Curbee services").toString();
+        try {
+            curbeeResponse = curbeeTarget.request(MediaType.APPLICATION_JSON)
+                    .post(Entity.entity(roObject.toString(), MediaType.APPLICATION_JSON));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(curbeeResponse != null) {
+            status = curbeeResponse.getStatus();
+            curbeeResponseString = curbeeResponse.readEntity(String.class);
+        }
 
-        int status = curbeeResponse.getStatus();
-        //TODO check status and update status of file objects accordingly
+        //check status and update status of file and objects in the database accordingly
+        for (StreamFile streamFile : fileList) {
+            MongoDB.STATUS_ENUM published = MongoDB.STATUS_ENUM.NotPublished;
 
-        String curbeeResponseString = curbeeResponse.readEntity(String.class);
+            if (MongoDB.streamROStatusHas(project, streamFile.getYear(), streamFile.getWeek(), streamFile.getId(), id,
+                    MongoDB.STATUS_ENUM.Deposited)) {
+                if (status == Response.Status.OK.getStatusCode()) {
+                    published = MongoDB.STATUS_ENUM.Published;
+                    //delete file if published
+                    File file_name = new File(streamFile.getFilePath());
+                    file_name.delete();
+                } else{
+                    //remove .processing from file if not published
+                    File file_name = new File(streamFile.getFilePath());
+                    File file_rename = new File(streamFile.getFilePath().replaceAll(".processing", ""));
+                    file_name.renameTo(file_rename);
+                }
+            }
+            //add published status to DB
+            MongoDB.addStreamStatus(project, streamFile.getYear(), streamFile.getWeek(), streamFile.getId(),
+                    new Date(), id, published);
+        }
 
+        if(status != Response.Status.OK.getStatusCode()) {
+            logger.info("RO failed to publish : " + id);
+        }
         return Response.status(status).entity(curbeeResponseString).build();
-        //return Response.ok().build();
     }
 
     private JSONObject createStreamRO(JSONObject metadataObject, String identifier) {
@@ -401,6 +473,12 @@ public class SEADClientService {
         //aggregation.put(Constants.PUBLISHING_PROJECT_NAME, "DIBBS");
         roObject.put("Aggregation", aggregation);
 
+        JSONObject preferences = new JSONObject();
+        preferences.put(Constants.PURPOSE, "Testing-Only");
+        preferences.put(Constants.LICENSE, "All Rights Reserved");
+        roObject.put(Constants.PREFERENCES, preferences);
+        roObject.put(Constants.PUBLICATION_CALLBACK, Constants.seadClientUrl + "/" + identifier + "/status");
+
         JSONObject aggregationStatistics = new JSONObject();
         aggregationStatistics.put(Constants.NUMBER_OF_DATASETS, metadataObject.getInt(Constants.NUMBER_OF_DATASETS));
         aggregationStatistics.put(Constants.MAX_DATA_SIZE, metadataObject.getLong(Constants.MAX_DATA_SIZE));
@@ -411,6 +489,21 @@ public class SEADClientService {
         roObject.put(Constants.AGGREGATION_STATISTICS, aggregationStatistics);
 
         return roObject;
+    }
+
+    @POST
+    @Path("/{id}/status")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response streamROAddStatus(@PathParam("id") String id) throws IOException {
+        return Response.ok().build();
+    }
+
+    @GET
+    @Path("/streamro/{project}/status")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response streamROGetStatus(@PathParam("project") String project) throws IOException {
+        JSONArray results = MongoDB.streamROGetStatus(project);
+        return Response.ok().entity(results.toString()).build();
     }
 
     private JSONObject createStreamOREMap(JSONObject metadataObject, String identifier) {
@@ -471,4 +564,5 @@ public class SEADClientService {
         return oreMap;
     }
 
+    //TODO add cleanup mechanism to fedora (check C3PR status)
 }
