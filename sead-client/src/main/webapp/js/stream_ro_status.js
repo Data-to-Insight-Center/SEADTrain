@@ -55,12 +55,13 @@ $(document).ready(function (){
                                 tr.append("<td>" + json[i].year + "</td>");
                                 var innerJson = json[i].status_list;
                                 var innerHtml = '<table class="table table-bordered">';
+                                innerHtml += "<tbody><tr><th>RO ID</th><th>Status</th><th>Date</th></tr></tbody><tbody>";
                                 for (var j = 0; j < innerJson.length; j++) {
                                     innerHtml += "<tr><td>" + innerJson[j].ro_id + "</td>";
                                     innerHtml += "<td>" + innerJson[j].status + "</td>";
                                     innerHtml += "<td>" + innerJson[j].date + "</td></tr>";
                                 }
-                                innerHtml += '</table>';
+                                innerHtml += '</tbody></table>';
                                 tr.append("<td>" + innerHtml + "</td>");
                                 $('#stream_ro_response_table').append(tr);
                             }
