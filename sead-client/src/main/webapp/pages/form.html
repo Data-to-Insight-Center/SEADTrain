@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>SEAD Standalone Client - RO Submission</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../css/sb-admin-2.css" rel="stylesheet">
+    <link href="../css/form.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="../css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <script src="../js/jquery.min.js"></script>
+    <script src="../js/underscore-min.js"></script>
+    <script type="text/javascript" src="../js/form.js"></script>
+    <script type="text/javascript">
+        $(function(){
+            $('#file-input').bind('change', function() {
+                document.getElementById('dataset-name').value= this.files[0].name;
+                document.getElementById('dataset-size').value= this.files[0].size;
+                document.getElementById('dataset-modified-date').value= this.files[0].lastModifiedDate;
+                document.getElementById('dataset-type').value= this.files[0].type;
+            });
+        });
+    </script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Static navbar -->
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <img src="../img/sead-logo.jpg" alt="SEAD"  style="height: 50px; padding-right: 20px;">
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="index.html">Home</a></li>
+                    <li><a href="documentation.html">Documentation</a></li>
+                    <!--<li><a href="#">Contact</a></li>-->
+                    <!--<li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                      <ul class="dropdown-menu">
+                        <li><a href="#">Action</a></li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li class="dropdown-header">Nav header</li>
+                        <li><a href="#">Separated link</a></li>
+                        <li><a href="#">One more separated link</a></li>
+                      </ul>
+                    </li>-->
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="active"><a href="form.html">RO Submission<span class="sr-only">(current)</span></a></li>
+                    <li><a href="status.html">RO Status</a></li>
+                    <li><a href="#">Admin</a></li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+    </nav>
+
+    <div >
+        <!--<div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Forms</h1>
+            </div>
+            &lt;!&ndash; /.col-lg-12 &ndash;&gt;
+        </div>-->
+        <!-- /.row -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3>Research Object Submit Request</h3>
+                    </div>
+                    <div class="panel-body">
+                        <form role="form" id="RoDetailsForm">
+                            <div class="row">
+
+                                <div class="col-lg-6">
+
+                                    <div class="form-group">
+                                        <label>Title</label>
+                                        <input class="form-control" id="title_input">
+                                        <!--<p class="help-block">Title for the Research Object.</p>-->
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Creator</label>
+                                        <input class="form-control" id="creator_input">
+                                        <!--<p class="help-block">Title for the Research Object.</p>-->
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Abstract</label>
+                                        <textarea class="form-control" rows="3" id="abstract_input"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Rights Holder</label>
+                                        <input class="form-control" id="rights_holder_input">
+                                        <!--<p class="help-block">Title for the Research Object.</p>-->
+                                    </div>
+                                    <div class="form-group">
+                                        <label>License</label>
+                                        <input class="form-control" id="license_input">
+                                        <!--<p class="help-block">Title for the Research Object.</p>-->
+                                    </div>
+                                    <!--<div class="form-group">
+                                        <label>Text Input with Placeholder</label>
+                                        <input class="form-control" placeholder="Enter text">
+                                    </div>-->
+                                    <!--<div class="form-group">
+                                        <label>Static Control</label>
+                                        <p class="form-control-static">email@example.com</p>
+                                    </div>-->
+                                    <!--<div class="form-group">
+                                        <label>Text area</label>
+                                        <textarea class="form-control" rows="3"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Checkboxes</label>
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" value="">Checkbox 1
+                                            </label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" value="">Checkbox 2
+                                            </label>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" value="">Checkbox 3
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Inline Checkboxes</label>
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox">1
+                                        </label>
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox">2
+                                        </label>
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox">3
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Radio Buttons</label>
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>Radio 1
+                                            </label>
+                                        </div>
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">Radio 2
+                                            </label>
+                                        </div>
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3">Radio 3
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Inline Radio Buttons</label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline1" value="option1" checked>1
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline2" value="option2">2
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline3" value="option3">3
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Selects</label>
+                                        <select class="form-control">
+                                            <option>1</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4</option>
+                                            <option>5</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Multiple Selects</label>
+                                        <select multiple class="form-control">
+                                            <option>1</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4</option>
+                                            <option>5</option>
+                                        </select>
+                                    </div>-->
+
+                                </div>
+                                <!-- /.col-lg-6 (nested) -->
+                                <div class="col-lg-6">
+                                    <h4>File Uploads</h4>
+                                    <div class="form-group">
+                                        <label>File input</label>
+                                        <input type="file" id="file-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>File Name</label>
+                                        <input class="form-control" id="dataset-name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>File Size</label>
+                                        <div class="form-group input-group">
+                                            <input id="dataset-size" class="form-control">
+                                            <span class="input-group-addon">bytes</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>File Type</label>
+                                        <input class="form-control" id="dataset-type">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>File Modified Date</label>
+                                        <input class="form-control" id="dataset-modified-date">
+                                    </div>
+                                    <!--  <form role="form">
+                                         <fieldset disabled>
+                                             <div class="form-group">
+                                                 <label for="disabledSelect">Disabled input</label>
+                                                 <input class="form-control" id="disabledInput" type="text" placeholder="Disabled input" disabled>
+                                             </div>
+                                             <div class="form-group">
+                                                 <label for="disabledSelect">Disabled select menu</label>
+                                                 <select id="disabledSelect" class="form-control">
+                                                     <option>Disabled select</option>
+                                                 </select>
+                                             </div>
+                                             <div class="checkbox">
+                                                 <label>
+                                                     <input type="checkbox">Disabled Checkbox
+                                                 </label>
+                                             </div>
+                                             <button type="submit" class="btn btn-primary">Disabled Button</button>
+                                         </fieldset>
+                                     </form>
+                                     <h1>Form Validation States</h1>
+                                     <form role="form">
+                                         <div class="form-group has-success">
+                                             <label class="control-label" for="inputSuccess">Input with success</label>
+                                             <input type="text" class="form-control" id="inputSuccess">
+                                         </div>
+                                         <div class="form-group has-warning">
+                                             <label class="control-label" for="inputWarning">Input with warning</label>
+                                             <input type="text" class="form-control" id="inputWarning">
+                                         </div>
+                                         <div class="form-group has-error">
+                                             <label class="control-label" for="inputError">Input with error</label>
+                                             <input type="text" class="form-control" id="inputError">
+                                         </div>
+                                     </form>
+                                     <h1>Input Groups</h1>
+                                     <form role="form">
+                                         <div class="form-group input-group">
+                                             <span class="input-group-addon">@</span>
+                                             <input type="text" class="form-control" placeholder="Username">
+                                         </div>
+                                         <div class="form-group input-group">
+                                             <input type="text" class="form-control">
+                                             <span class="input-group-addon">.00</span>
+                                         </div>
+                                         <div class="form-group input-group">
+                                                 <span class="input-group-addon"><i class="fa fa-eur"></i>
+                                                 </span>
+                                             <input type="text" class="form-control" placeholder="Font Awesome Icon">
+                                         </div>
+                                         <div class="form-group input-group">
+                                             <span class="input-group-addon">$</span>
+                                             <input type="text" class="form-control">
+                                             <span class="input-group-addon">.00</span>
+                                         </div>
+                                         <div class="form-group input-group">
+                                             <input type="text" class="form-control">
+                                                 <span class="input-group-btn">
+                                                     <button class="btn btn-default" type="button"><i class="fa fa-search"></i>
+                                                     </button>
+                                                 </span>
+                                         </div>
+                                     </form> -->
+                                </div>
+                                <!-- /.col-lg-6 (nested) -->
+                            </div>
+                            <button type="button" class="btn btn-primary SubmitForm">Submit</button>
+                            <button type="reset" class="btn btn-default ResetForm">Reset</button>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div id="status_div" class="status_hidden">
+                                        <label style="margin-bottom: 0px; padding-top: 10px; padding-left: 10px;">Response</label>
+                                        <pre>
+                                            <code id="status_div_code">
+                                                Status
+                                            </code>
+                                        </pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- /.row (nested) -->
+                    </div>
+                    <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+            </div>
+            <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /#page-wrapper -->
+
+</div>
+<!-- /#wrapper -->
+
+
+
+<!-- jQuery -->
+<script src="../js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="../js/bootstrap.min.js"></script>
+
+<!-- Metis Menu Plugin JavaScript -->
+<script src="../js/metisMenu.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="../js/sb-admin-2.js"></script>
+
+</body>
+
+</html>

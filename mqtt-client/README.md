@@ -1,6 +1,6 @@
 # Getting started with MQTT and Java
 
-This project is a simple java application to show how to start MQTT application and get the message from air box sensor subscriber and write those raw data into separate files based on the week and device model.
+This project is a simple java application to show how to start MQTT application, get the message from air box sensor subscriber and write the raw data into separate files depending on the week and device model.
 
 ## Prerequisite
 
@@ -19,14 +19,14 @@ This project is a simple java application that runs a subscriber using the [Ecli
 $ mvn clean install
 ```
 
-For convenience, the project is set up so that the maven package target produces a single executable, 
+For convenience, the project is set up that the maven package target produces a single executable, 
 `/mqtt-client `, that includes all of the programs and dependencies.
 
 
-**2- Run the Subscriber**
+**2- Run the subscriber**
 
-The subscriber will receive and write all the messages(sensor raw data) from sensors into the separate files based on the week and device model.
+The subscriber will receive and write all the messages(sensor raw data) from air box sensors into separate files depending on the week and device model.
 
 ```
-$ nohup ./target/mqtt-sample subscriber > /dev/null 2>&1&
+$ nohup ./target/mqtt-client subscriber > /dev/null 2>&1&
 ```
