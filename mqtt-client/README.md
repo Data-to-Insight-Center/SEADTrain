@@ -25,8 +25,21 @@ For convenience, the project is set up that the maven package target produces a 
 
 **2- Run the subscriber**
 
-The subscriber will receive and write all the messages(sensor raw data) from air box sensors into separate files depending on the week and device model.
+The subscriber will receive and write all the messages(sensor raw data) from air box sensors into separate files depending on the day or week by device model. 
 
+To get the raw data of "day by device" output file run the below command
 ```
-$ nohup ./target/mqtt-client subscriber > /dev/null 2>&1&
+$ nohup ./target/mqtt-client day > /dev/null 2>&1&
+```
+
+OR
+
+To get the raw data of "week by device" output file run the below command
+```
+$ nohup ./target/mqtt-client weekly > /dev/null 2>&1&
+```
+
+After ran one of the above command you can find the output files in the "sensordata" folder.
+```
+$ cd ./sensordata/
 ```
