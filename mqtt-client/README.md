@@ -1,6 +1,6 @@
 # Getting started with MQTT and Java
 
-This project is a simple java application to show how to start MQTT application, get the message from air box sensor subscriber and write the raw data into separate files depending on the week and device model.
+This project is a simple java application to show how to start MQTT application, get the message from air box sensor subscriber and write the raw data into separate files as weekly/daily by device models.
 
 ## Prerequisite
 
@@ -25,11 +25,11 @@ For convenience, the project is set up that the maven package target produces a 
 
 **2- Run the subscriber**
 
-The subscriber will receive and write all the messages(sensor raw data) from air box sensors into separate files depending on the day or week by device model. 
+The subscriber will receive and write all the messages(sensor raw data) from air box sensors into separate files as the weekly/daily by device models. 
 
 To get the raw data of "day by device" output file run the below command
 ```
-$ nohup ./target/mqtt-client day > /dev/null 2>&1&
+$ nohup ./target/mqtt-client daily > /dev/null 2>&1&
 ```
 
 OR
