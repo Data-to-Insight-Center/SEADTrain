@@ -50,6 +50,7 @@ public class Constants {
     public static final String RIGHTS = "Rights";
     public static final String LABEL = "Label";
     public static final String CREATION_DATE = "Creation Date";
+    public static final String LAST_MODIFIED = "Last Modified";
     public static final String CREATOR = "Creator";
     public static final String ABSTRACT = "Abstract";
     public static final String PUBLICATION_DATE = "Publication Date";
@@ -110,6 +111,7 @@ public class Constants {
         OREMetadataMap.put(RIGHTS, "http://purl.org/dc/terms/rights");
         OREMetadataMap.put(LABEL, "http://www.w3.org/2000/01/rdf-schema#label");
         OREMetadataMap.put(CREATION_DATE, "http://purl.org/dc/terms/created");
+        OREMetadataMap.put(LAST_MODIFIED, "http://sead-data.net/terms/lastModified");
         OREMetadataMap.put(CREATOR, "http://purl.org/dc/terms/creator");
         OREMetadataMap.put(ABSTRACT, "http://purl.org/dc/terms/abstract");
         OREMetadataMap.put(PUBLICATION_DATE, "http://purl.org/dc/terms/issued");
@@ -128,6 +130,7 @@ public class Constants {
         roMetadataMap.put(DESCRIPTION, "http://purl.org/dc/elements/1.1/description");
         roMetadataMap.put(LABEL, "http://www.w3.org/2000/01/rdf-schema#label");
         roMetadataMap.put(CREATION_DATE, "http://purl.org/dc/terms/created");
+        roMetadataMap.put(LAST_MODIFIED, "http://sead-data.net/terms/lastModified");
         roMetadataMap.put(CREATOR, "http://purl.org/dc/terms/creator");
         roMetadataMap.put(ABSTRACT, "http://purl.org/dc/terms/abstract");
         roMetadataMap.put(PUBLICATION_DATE, "http://purl.org/dc/terms/issued");

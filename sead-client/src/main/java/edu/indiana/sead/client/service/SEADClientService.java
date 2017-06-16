@@ -53,6 +53,9 @@ public class SEADClientService {
 
     private WebTarget fedoraWebService;
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+    private SimpleDateFormat folderDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private SimpleDateFormat roDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
     private static Logger logger = Logger.getLogger(SEADClientService.class);
 
     //Stream RO constants
@@ -65,7 +68,7 @@ public class SEADClientService {
     public static final String TITLE = "title";
     public static final String FILES = "files";
 
-    public static final String streamFileFormat = "(\\w+)-(\\w+)-(\\w+)"; // year-week-deviceID
+    public static final String streamFileFormat = "(\\w+)_(\\w+)_(\\w+)"; // year-week-deviceID
 
     public SEADClientService() {
         fedoraWebService = ClientBuilder.newClient().target(Constants.fedoraUrl + "/dibbs");
@@ -240,13 +243,21 @@ public class SEADClientService {
     @POST
     @Path("/streamro")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response publishStreamRo(String roData) throws IOException {
+    public Response publishStreamRo(String roData) throws IOException, ParseException {
 
         JSONObject metadataObject = new JSONObject(roData);
         String folder = metadataObject.getString(FOLDER);
         String project = metadataObject.getString(PROJECT);
         String id = project + "-" + UUID.randomUUID().toString();
         Client client = ClientBuilder.newBuilder().register(MultiPartFeature.class).build();
+
+        String[] paths = folder.split("/");
+        String folderName = paths[paths.length -1];
+        String fromDateTime = folderName + "T00:00:00Z";
+        Calendar c = Calendar.getInstance();
+        c.setTime(folderDateFormat.parse(folderName));
+        c.add(Calendar.DATE, 1);
+        String toDateTime = roDateFormat.format(c.getTime());
 
         // Create folder in Fedora with id
         WebTarget fedoraWebService = ClientBuilder.newClient().target(Constants.fedoraUrl + "/" + project);
@@ -362,7 +373,8 @@ public class SEADClientService {
             fileObject.put(Constants.TITLE, fileName);
             fileObject.put(Constants.SIZE, size);
             fileObject.put(Constants.MIMETYPE, mimeType);
-            fileObject.put(Constants.CREATION_DATE, lastModified);
+            fileObject.put(Constants.CREATION_DATE, fromDateTime);
+            fileObject.put(Constants.LAST_MODIFIED, toDateTime);
             fileObject.put(Constants.SIMILAR_TO, similarTo);
             filesArray.put(fileObject);
         }
@@ -376,6 +388,8 @@ public class SEADClientService {
         roMetadataObj.put(Constants.CREATOR, metadataObject.getString(CREATOR));
         roMetadataObj.put(Constants.TITLE, metadataObject.getString(ABSTRACT));
         roMetadataObj.put(Constants.ABSTRACT, metadataObject.getString(TITLE));
+        roMetadataObj.put(Constants.CREATION_DATE, fromDateTime);
+        roMetadataObj.put(Constants.LAST_MODIFIED, toDateTime);
         roMetadataObj.put(Constants.PUBLISHING_PROJECT, project);
         roMetadataObj.put(Constants.REPOSITORY, metadataObject.getString(REPOSITORY));
         roMetadataObj.put(Constants.NUMBER_OF_DATASETS, noOfFiles);
@@ -463,7 +477,8 @@ public class SEADClientService {
         aggregation.put("@id", Constants.fedoraUrl + "/" +
                 metadataObject.getString(Constants.PUBLISHING_PROJECT) + "/" + identifier + "/oreMap");
         aggregation.put(Constants.IDENTIFIER, identifier);
-        aggregation.put(Constants.CREATION_DATE, creation_date);
+        aggregation.put(Constants.CREATION_DATE, metadataObject.getString(Constants.CREATION_DATE));
+        aggregation.put(Constants.LAST_MODIFIED, metadataObject.getString(Constants.LAST_MODIFIED));
         //aggregation.put(Constants.PUBLICATION_DATE, creation_date);
         aggregation.put(Constants.TITLE, metadataObject.getString(Constants.TITLE));
         //aggregation.put(Constants.LABEL, metadataObject.getString("TITLE"));
@@ -523,12 +538,13 @@ public class SEADClientService {
         SimpleDateFormat fileDateFormat = new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss 'GMT'Z (z)");
         String creation_date = simpleDateFormat.format(new Date());
 
-        oreMap.put(Constants.CREATION_DATE, creation_date);
+        oreMap.put(Constants.CREATION_DATE, metadataObject.getString(Constants.CREATION_DATE));
 
         JSONObject describes = new JSONObject();
         describes.put("@type", new JSONArray().put("Aggregation").put("http://cet.ncsa.uiuc.edu/2015/Dataset"));
         describes.put(Constants.IDENTIFIER, identifier);
-        describes.put(Constants.CREATION_DATE, creation_date);
+        describes.put(Constants.CREATION_DATE, metadataObject.getString(Constants.CREATION_DATE));
+        describes.put(Constants.LAST_MODIFIED, metadataObject.getString(Constants.LAST_MODIFIED));
         describes.put(Constants.PUBLICATION_DATE, creation_date);
         describes.put(Constants.TITLE, metadataObject.getString(Constants.TITLE));
         describes.put(Constants.LABEL, metadataObject.getString(Constants.TITLE));
@@ -552,7 +568,8 @@ public class SEADClientService {
             fileObject.put(Constants.LABEL, fileMetaObj.getString(Constants.TITLE));
             fileObject.put(Constants.SIZE, fileMetaObj.getLong(Constants.SIZE));
             fileObject.put(Constants.MIMETYPE, fileMetaObj.getString(Constants.MIMETYPE));
-            fileObject.put(Constants.CREATION_DATE, simpleDateFormat.format((Date)fileMetaObj.get(Constants.CREATION_DATE)));
+            fileObject.put(Constants.CREATION_DATE, fileMetaObj.getString(Constants.CREATION_DATE));
+            fileObject.put(Constants.LAST_MODIFIED, fileMetaObj.getString(Constants.LAST_MODIFIED));
             fileObject.put(Constants.PUBLICATION_DATE, creation_date);
             fileObject.put(Constants.SIMILAR_TO, fileMetaObj.getString(Constants.SIMILAR_TO));
             aggregates.put(fileObject);
