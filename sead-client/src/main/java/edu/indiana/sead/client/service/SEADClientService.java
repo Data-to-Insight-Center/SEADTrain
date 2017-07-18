@@ -38,7 +38,9 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.ParseException;
@@ -69,9 +71,12 @@ public class SEADClientService {
     public static final String FILES = "files";
 
     public static final String streamFileFormat = "(\\w+)_(\\w+)_(\\w+)"; // year-week-deviceID
+    public static Map<String, List<String>> projectMetadata = new HashMap<>();
 
     public SEADClientService() {
         fedoraWebService = ClientBuilder.newClient().target(Constants.fedoraUrl + "/dibbs");
+        projectMetadata.put("airbox", Arrays.asList(Constants.DEVICE_ID, Constants.DEVICE,
+                Constants.GPS_LAT, Constants.GPS_LON));
     }
 
     @GET
@@ -376,6 +381,7 @@ public class SEADClientService {
             fileObject.put(Constants.CREATION_DATE, fromDateTime);
             fileObject.put(Constants.LAST_MODIFIED, toDateTime);
             fileObject.put(Constants.SIMILAR_TO, similarTo);
+            addProjectSpecificMetadata(project, fileObject, streamFile);
             filesArray.put(fileObject);
         }
 
@@ -386,17 +392,17 @@ public class SEADClientService {
 
         //populate metadata
         roMetadataObj.put(Constants.CREATOR, metadataObject.getString(CREATOR));
-        roMetadataObj.put(Constants.TITLE, metadataObject.getString(ABSTRACT));
-        roMetadataObj.put(Constants.ABSTRACT, metadataObject.getString(TITLE));
+        roMetadataObj.put(Constants.TITLE, metadataObject.getString(TITLE));
+        roMetadataObj.put(Constants.ABSTRACT, metadataObject.getString(ABSTRACT));
         roMetadataObj.put(Constants.CREATION_DATE, fromDateTime);
         roMetadataObj.put(Constants.LAST_MODIFIED, toDateTime);
         roMetadataObj.put(Constants.PUBLISHING_PROJECT, project);
         roMetadataObj.put(Constants.REPOSITORY, metadataObject.getString(REPOSITORY));
-        roMetadataObj.put(Constants.NUMBER_OF_DATASETS, noOfFiles);
-        roMetadataObj.put(Constants.MAX_DATA_SIZE, maxSize);
-        roMetadataObj.put(Constants.MAX_COLLECTION_DEPTH, 0);
-        roMetadataObj.put(Constants.TOTAL_SIZE, totalSize);
-        roMetadataObj.put(Constants.NUMBER_OF_COLLECTIONS, 0);
+        roMetadataObj.put(Constants.NUMBER_OF_DATASETS, noOfFiles + "");
+        roMetadataObj.put(Constants.MAX_DATA_SIZE, maxSize + "");
+        roMetadataObj.put(Constants.MAX_COLLECTION_DEPTH, 0 +"");
+        roMetadataObj.put(Constants.TOTAL_SIZE, totalSize + "");
+        roMetadataObj.put(Constants.NUMBER_OF_COLLECTIONS, 0 + "");
         roMetadataObj.put(Constants.DATA_MIMETYPE, new JSONArray(mimeTypes));
         roMetadataObj.put(FILES, filesArray);
 
@@ -455,6 +461,29 @@ public class SEADClientService {
         return Response.status(status).entity(curbeeResponseString).build();
     }
 
+    private void addProjectSpecificMetadata(String project, JSONObject fileObject, StreamFile streamFile) {
+        if(project.equals("airbox")) {
+            try {
+                FileReader fileReader = new FileReader(new File(streamFile.getFilePath()));
+                BufferedReader br = new BufferedReader(fileReader);
+                String line = null;
+                while ((line = br.readLine()) != null) {
+                    String[] array = line.split("\\|");
+                    for(int i = 0 ; i < array.length ; i++) {
+                        for(String key : projectMetadata.get("airbox")) {
+                            if(array[i].split("=")[0].equals(key)) {
+                                fileObject.put(key, array[i].split("=")[1]);
+                            }
+                        }
+                    }
+                    break;
+                }
+            } catch (IOException e) {
+                logger.error("Error while adding project specific metadata for the project Airbox : " + e.getMessage());
+            }
+        }
+    }
+
     private JSONObject createStreamRO(JSONObject metadataObject, String identifier) {
         JSONObject roObject = new JSONObject();
 
@@ -495,11 +524,11 @@ public class SEADClientService {
         roObject.put(Constants.PUBLICATION_CALLBACK, Constants.seadClientUrl + "/" + identifier + "/status");
 
         JSONObject aggregationStatistics = new JSONObject();
-        aggregationStatistics.put(Constants.NUMBER_OF_DATASETS, metadataObject.getInt(Constants.NUMBER_OF_DATASETS));
-        aggregationStatistics.put(Constants.MAX_DATA_SIZE, metadataObject.getLong(Constants.MAX_DATA_SIZE));
-        aggregationStatistics.put(Constants.MAX_COLLECTION_DEPTH, metadataObject.getInt(Constants.MAX_COLLECTION_DEPTH));
-        aggregationStatistics.put(Constants.TOTAL_SIZE, metadataObject.getLong(Constants.TOTAL_SIZE));
-        aggregationStatistics.put(Constants.NUMBER_OF_COLLECTIONS, metadataObject.getInt(Constants.NUMBER_OF_COLLECTIONS));
+        aggregationStatistics.put(Constants.NUMBER_OF_DATASETS, metadataObject.getString(Constants.NUMBER_OF_DATASETS));
+        aggregationStatistics.put(Constants.MAX_DATA_SIZE, metadataObject.getString(Constants.MAX_DATA_SIZE));
+        aggregationStatistics.put(Constants.MAX_COLLECTION_DEPTH, metadataObject.getString(Constants.MAX_COLLECTION_DEPTH));
+        aggregationStatistics.put(Constants.TOTAL_SIZE, metadataObject.getString(Constants.TOTAL_SIZE));
+        aggregationStatistics.put(Constants.NUMBER_OF_COLLECTIONS, metadataObject.getString(Constants.NUMBER_OF_COLLECTIONS));
         aggregationStatistics.put(Constants.DATA_MIMETYPE, metadataObject.get(Constants.DATA_MIMETYPE));
         roObject.put(Constants.AGGREGATION_STATISTICS, aggregationStatistics);
 
@@ -572,6 +601,9 @@ public class SEADClientService {
             fileObject.put(Constants.LAST_MODIFIED, fileMetaObj.getString(Constants.LAST_MODIFIED));
             fileObject.put(Constants.PUBLICATION_DATE, creation_date);
             fileObject.put(Constants.SIMILAR_TO, fileMetaObj.getString(Constants.SIMILAR_TO));
+            for(String projectMeta : projectMetadata.get(metadataObject.getString(Constants.PUBLISHING_PROJECT))) {
+                fileObject.put(projectMeta, fileMetaObj.getString(projectMeta));
+            }
             aggregates.put(fileObject);
         }
         describes.put(Constants.HAS_PART, fileIds);

@@ -77,6 +77,13 @@ public class Constants {
     public static final String NUMBER_OF_COLLECTIONS = "Number of Collections";
     public static final String DATA_MIMETYPE = "Data Mimetypes";
 
+    //airbox specific metadata
+    public static final String DEVICE_ID = "device_id";
+    public static final String DEVICE = "device";
+    public static final String GPS_LAT = "gps_lat";
+    public static final String GPS_LON = "gps_lon";
+
+
 	static {
 		try {
 			loadConfigurations();
@@ -121,6 +128,12 @@ public class Constants {
         OREMetadataMap.put(KEYWORDS, "http://www.holygoat.co.uk/owl/redwood/0.1/tags/taggedWithTag");
         OREMetadataMap.put(MIMETYPE, "http://purl.org/dc/elements/1.1/format");
         OREMetadataMap.put(UNIT, "http://ecgs.ncsa.illinois.edu/gsis/sas/unit/udunits2");
+
+        //airbox specific URIs
+        OREMetadataMap.put(DEVICE_ID, "http://sead-data.net/terms/deviceId");
+        OREMetadataMap.put(DEVICE, "http://sead-data.net/terms/device");
+        OREMetadataMap.put(GPS_LAT, "http://sead-data.net/terms/latitude");
+        OREMetadataMap.put(GPS_LON, "http://sead-data.net/terms/longitude");
     }
 
     private static void populateROContext() {
