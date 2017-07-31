@@ -1,6 +1,6 @@
 #!/bin/sh
 
-date=$(date +"%Y-%m-%d")
+date=$(date -d "-1 days" +"%Y-%m-%d")
 url="http://localhost:8083/sead-client/rest/streamro"
 folder="/data/folder/"$date"/"
 project="airbox"
