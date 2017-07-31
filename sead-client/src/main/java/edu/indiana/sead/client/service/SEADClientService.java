@@ -70,7 +70,7 @@ public class SEADClientService {
     public static final String TITLE = "title";
     public static final String FILES = "files";
 
-    public static final String streamFileFormat = "(\\w+)_(\\w+)_(\\w+)"; // year-week-deviceID
+    public static final String streamFileFormat = "([\\w-]+)_([\\w-]+)_([\\w-]+)"; // year-week-deviceID
     public static Map<String, List<String>> projectMetadata = new HashMap<>();
 
     public SEADClientService() {
