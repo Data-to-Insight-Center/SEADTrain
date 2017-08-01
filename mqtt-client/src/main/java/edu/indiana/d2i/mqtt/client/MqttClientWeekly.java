@@ -69,7 +69,7 @@ public class MqttClientWeekly {
 					Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 					String week_num = String.format("%02d", cal.get(Calendar.WEEK_OF_YEAR));
 					int year = cal.get(Calendar.YEAR);
-					String month = String.format("%02d", cal.get(Calendar.MONTH));
+					String month = String.format("%02d", (cal.get(Calendar.MONTH) + 1));
 					String day = String.format("%02d", MqttClientWeekly.getLastSunday());
 					
 		            @Override

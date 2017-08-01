@@ -70,7 +70,7 @@ public class MqttClientDaily {
 					Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 					String day_num = String.format("%03d", cal.get(Calendar.DAY_OF_YEAR));
 					int year = cal.get(Calendar.YEAR);
-					String month = String.format("%02d", cal.get(Calendar.MONTH));
+					String month = String.format("%02d", (cal.get(Calendar.MONTH) + 1));
 					String day = String.format("%02d", cal.get(Calendar.DATE));
 					
 		            @Override
