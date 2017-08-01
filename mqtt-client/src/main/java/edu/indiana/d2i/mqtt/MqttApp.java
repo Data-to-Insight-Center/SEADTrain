@@ -37,35 +37,35 @@ public class MqttApp {
     	          public void run()
     	          {
     	        	  MqttClientDaily.main(args);
+    	        	  
+    	        	  File sen_data_file = new File("sensordata");
+    	    		  if (!sen_data_file.exists()) {
+    	    			  sen_data_file.mkdir();	                
+    	    		  }
+    	    		  File pub_sen_data_file = new File("publish_sensordata");
+    	    		  if (!pub_sen_data_file.exists()) {
+    	    			  pub_sen_data_file.mkdir();	                
+    	    		  }
+    	    			
+    	    		  Date date = DateUtils.addDays(new Date(), -1);
+    	    		  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    	    	      String yest_date = sdf.format(date);
+    	    	      
+    	    	      File last_pub_sen_data_file = new File("publish_sensordata/" + yest_date);			
+    	    		  File srcDir = new File("sensordata/" + yest_date);
+    	    		  File destDir = new File("publish_sensordata");
+    	    		  if (!last_pub_sen_data_file.exists()) {
+    	    			  try {
+    	    				  FileUtils.copyDirectoryToDirectory(srcDir, destDir);
+    	    			  } catch (IOException e) {
+    	    				  // TODO Auto-generated catch block
+    	    				  logger.error("Particular day folder not copied successfully: ", e);
+    	    			  }             
+    	    		  }
     	          }
     	      },
     	      0,      // run first occurrence immediately
     	      1000);
-    	  
-    	  File sen_data_file = new File("sensordata");
-		  if (!sen_data_file.exists()) {
-			  sen_data_file.mkdir();	                
-		  }
-		  File pub_sen_data_file = new File("publish_sensordata");
-		  if (!pub_sen_data_file.exists()) {
-			  pub_sen_data_file.mkdir();	                
-		  }
-			
-		  Date date = DateUtils.addDays(new Date(), -1);
-		  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-	      String yest_date = sdf.format(date);
-	      
-	      File last_pub_sen_data_file = new File("publish_sensordata/" + yest_date);			
-		  File srcDir = new File("sensordata/" + yest_date);
-		  File destDir = new File("publish_sensordata");
-		  if (!last_pub_sen_data_file.exists()) {
-			  try {
-				  FileUtils.copyDirectoryToDirectory(srcDir, destDir);
-			  } catch (IOException e) {
-				  // TODO Auto-generated catch block
-				  logger.error("Particular day folder not copied successfully: ", e);
-			  }             
-		  }		  
     	  
         break;
         
