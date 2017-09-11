@@ -42,6 +42,10 @@ public class MqttClientWeekly {
 	        if (!sen_data_file.exists()) {
 	        	sen_data_file.mkdir();	                
 	        }
+			File airbox_copy_data_file = new File("airbox_copy_sensordata");
+	        if (!airbox_copy_data_file.exists()) {
+	        	airbox_copy_data_file.mkdir();	                
+	        }
 	        MqttClientWeekly mcw = new MqttClientWeekly();
 	        mcw.runClient();
 		}
@@ -69,7 +73,7 @@ public class MqttClientWeekly {
 					Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 					String week_num = String.format("%02d", cal.get(Calendar.WEEK_OF_YEAR));
 					int year = cal.get(Calendar.YEAR);
-					String month = String.format("%02d", cal.get(Calendar.MONTH));
+					String month = String.format("%02d", (cal.get(Calendar.MONTH) + 1));
 					String day = String.format("%02d", MqttClientWeekly.getLastSunday());
 					
 		            @Override
@@ -123,6 +127,67 @@ public class MqttClientWeekly {
 			            		        } else if (listOfFolders[i].isDirectory()) {			            		        	
 			            			        String folder_name = listOfFolders[i].getName();
 			            			        String sub_file_dir = "sensordata/" + folder_name + "/";
+			            			        File sub_directory = new File(sub_file_dir);
+					            			File[] listOfFiles = sub_directory.listFiles();
+					            			
+					            			for (int j = 0; j < listOfFiles.length; j++) {	
+				            			        String file_name = listOfFiles[j].getName();
+				            			        
+				            			        if(!(file_name.contains(year + "_W" + week_num)) && file_name.contains(".tmp") && file_name.contains(year + "_W")){
+				            			        	String file2_name = file_name.split(".tmp")[0] + ".txt";
+				            			        	File file1 = new File(sub_file_dir + file_name);
+				            			        	File file2 = new File(sub_file_dir + file2_name); // destination dir of your file
+							            			boolean success = file1.renameTo(file2);
+				            			        }
+					            			}
+			            		        }
+			            		    }
+			            		}
+		            	    }
+		            	}if(topic.contains("LASS/AirBox_COPY")){
+		            		String[] value_split = message.toString().split("\\|");
+		        			
+		            		for (String val : value_split) {
+		            			if(val.contains("device_id")){
+			            			String device_id = val.split("\\=")[1];
+			            			
+			            			File DataFolder = new File(year + "-" + month + "-" + day);
+			            			String data_dir = "airbox_copy_sensordata/";			            			
+			            			File day_sen_data_file = new File(data_dir + DataFolder);
+			            	        if (!day_sen_data_file.exists()) {
+			            	        	day_sen_data_file.mkdir();	                
+			            	        }
+			            	        String folder_dir = "airbox_copy_sensordata/" + year + "-" + month + "-" + day + "/";
+			            	        File dataFile = new File(year + "_W" + week_num + "_" + device_id + ".tmp");
+			            			File resource = new File(folder_dir + dataFile);
+			            			if(resource.exists()){			            				
+				            			fw = new FileWriter(resource, true);
+						    			bw = new BufferedWriter(fw);
+						    			bw.write(message.toString() + "\n");
+						    			bw.close();
+			            			}else{
+				            			fw = new FileWriter(resource);
+						    			bw = new BufferedWriter(fw);
+						    			bw.write(message.toString() + "\n");
+						    			bw.close();
+			            			}
+			            			
+			            			File directory = new File(data_dir);
+			            			File[] listOfFolders = directory.listFiles();
+
+			            		    // get all the files from a directory
+			            		    for (int i = 0; i < listOfFolders.length; i++) {
+			            		        if (listOfFolders[i].isFile()) {
+			            		        	String file_name = listOfFolders[i].getName();
+			            			        if(!(file_name.contains(year + "_W" + week_num)) && file_name.contains(".tmp") && file_name.contains(year + "_W") ){
+			            			        	String file2_name = file_name.split(".tmp")[0] + ".txt";
+			            			        	File file1 = new File(data_dir + file_name);
+			            			        	File file2 = new File(data_dir + file2_name); // destination dir of your file
+						            			boolean success = file1.renameTo(file2);
+			            			        }
+			            		        } else if (listOfFolders[i].isDirectory()) {			            		        	
+			            			        String folder_name = listOfFolders[i].getName();
+			            			        String sub_file_dir = "airbox_copy_sensordata/" + folder_name + "/";
 			            			        File sub_directory = new File(sub_file_dir);
 					            			File[] listOfFiles = sub_directory.listFiles();
 					            			

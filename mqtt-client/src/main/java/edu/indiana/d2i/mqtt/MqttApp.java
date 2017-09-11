@@ -3,15 +3,24 @@ package edu.indiana.d2i.mqtt;
 import edu.indiana.d2i.mqtt.client.MqttClientDaily;
 import edu.indiana.d2i.mqtt.client.MqttClientWeekly;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.apache.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 /**
  * Basic launcher for mqtt message subscriber for daily or weekly
  */
 public class MqttApp {
+	
+	static final Logger logger = Logger.getLogger(MqttClientWeekly.class.getName());
 
   public static void main(final String[] args) throws MqttException {
 
@@ -28,6 +37,31 @@ public class MqttApp {
     	          public void run()
     	          {
     	        	  MqttClientDaily.main(args);
+    	        	  
+    	        	  File sen_data_file = new File("sensordata");
+    	    		  if (!sen_data_file.exists()) {
+    	    			  sen_data_file.mkdir();	                
+    	    		  }
+    	    		  File pub_sen_data_file = new File("publish_sensordata");
+    	    		  if (!pub_sen_data_file.exists()) {
+    	    			  pub_sen_data_file.mkdir();	                
+    	    		  }
+    	    			
+    	    		  Date date = DateUtils.addDays(new Date(), -1);
+    	    		  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    	    	      String yest_date = sdf.format(date);
+    	    	      
+    	    	      File last_pub_sen_data_file = new File("publish_sensordata/" + yest_date);			
+    	    		  File srcDir = new File("sensordata/" + yest_date);
+    	    		  File destDir = new File("publish_sensordata");
+    	    		  if (!last_pub_sen_data_file.exists()) {
+    	    			  try {
+    	    				  FileUtils.copyDirectoryToDirectory(srcDir, destDir);
+    	    			  } catch (IOException e) {
+    	    				  // TODO Auto-generated catch block
+    	    				  logger.error("Particular day folder not copied successfully: ", e);
+    	    			  }             
+    	    		  }
     	          }
     	      },
     	      0,      // run first occurrence immediately
