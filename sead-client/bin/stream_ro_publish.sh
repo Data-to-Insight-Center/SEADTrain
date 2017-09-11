@@ -8,7 +8,8 @@ creator="Test Creator"
 abstract="test abstract1"
 title="test title1"
 repository="iusc-azure"
-postString="{\"folder\" : \""$folder"\", \"project\" : \""$project"\", \"creator\": \""$creator"\", \"abstract\" : \""$abstract"\", \"title\" : \""$title"\", \"repository\" : \""$repository"\"}"
+purpose="Production"
+postString="{\"folder\" : \""$folder"\", \"project\" : \""$project"\", \"creator\": \""$creator"\", \"abstract\" : \""$abstract"\", \"title\" : \""$title"\", \"repository\" : \""$repository"\", \"purpose\" : \""$purpose"\"}"
 
 echo publishing data in $folder
 curl -H "Content-Type: application/json" -X POST -d ''"$postString"'' $url

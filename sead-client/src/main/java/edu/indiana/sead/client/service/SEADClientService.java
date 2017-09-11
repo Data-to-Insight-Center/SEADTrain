@@ -66,6 +66,7 @@ public class SEADClientService {
     public static final String ABSTRACT = "abstract";
     public static final String CREATOR = "creator";
     public static final String REPOSITORY = "repository";
+    public static final String PURPOSE = "purpose";
     public static final String RIGHTS_HOLDER = "rightsHolder";
     public static final String TITLE = "title";
     public static final String FILES = "files";
@@ -398,6 +399,7 @@ public class SEADClientService {
         roMetadataObj.put(Constants.LAST_MODIFIED, toDateTime);
         roMetadataObj.put(Constants.PUBLISHING_PROJECT, project);
         roMetadataObj.put(Constants.REPOSITORY, metadataObject.getString(REPOSITORY));
+        roMetadataObj.put(Constants.PURPOSE, metadataObject.getString(PURPOSE));
         roMetadataObj.put(Constants.NUMBER_OF_DATASETS, noOfFiles + "");
         roMetadataObj.put(Constants.MAX_DATA_SIZE, maxSize + "");
         roMetadataObj.put(Constants.MAX_COLLECTION_DEPTH, 0 +"");
@@ -518,7 +520,7 @@ public class SEADClientService {
         roObject.put("Aggregation", aggregation);
 
         JSONObject preferences = new JSONObject();
-        preferences.put(Constants.PURPOSE, "Testing-Only");
+        preferences.put(Constants.PURPOSE, metadataObject.getString(Constants.PURPOSE));
         preferences.put(Constants.LICENSE, "All Rights Reserved");
         roObject.put(Constants.PREFERENCES, preferences);
         roObject.put(Constants.PUBLICATION_CALLBACK, Constants.seadClientUrl + "/" + identifier + "/status");
