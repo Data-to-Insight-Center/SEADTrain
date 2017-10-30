@@ -67,6 +67,7 @@ public class Constants {
     public static final String PREFERENCES = "Preferences";
     public static final String SIMILAR_TO = "similarTo";
     public static final String PURPOSE = "Purpose";
+    public static final String CHANNEL = "Channel";
     public static final String PUBLICATION_CALLBACK = "Publication Callback";
 
     public static final String AGGREGATION_STATISTICS = "Aggregation Statistics";

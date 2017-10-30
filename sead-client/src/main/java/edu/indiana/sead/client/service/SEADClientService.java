@@ -70,6 +70,7 @@ public class SEADClientService {
     public static final String RIGHTS_HOLDER = "rightsHolder";
     public static final String TITLE = "title";
     public static final String FILES = "files";
+    public static final String CHANNEL = "channel";
 
     public static final String streamFileFormat = "([\\w-]+)_([\\w-]+)_([\\w-]+)"; // year-week-deviceID
     public static Map<String, List<String>> projectMetadata = new HashMap<>();
@@ -78,6 +79,7 @@ public class SEADClientService {
         fedoraWebService = ClientBuilder.newClient().target(Constants.fedoraUrl + "/dibbs");
         projectMetadata.put("airbox", Arrays.asList(Constants.DEVICE_ID, Constants.DEVICE,
                 Constants.GPS_LAT, Constants.GPS_LON));
+        //projectMetadata.put("twitter", new ArrayList<String>());
     }
 
     @GET
@@ -400,6 +402,7 @@ public class SEADClientService {
         roMetadataObj.put(Constants.PUBLISHING_PROJECT, project);
         roMetadataObj.put(Constants.REPOSITORY, metadataObject.getString(REPOSITORY));
         roMetadataObj.put(Constants.PURPOSE, metadataObject.getString(PURPOSE));
+        roMetadataObj.put(Constants.CHANNEL, metadataObject.getString(CHANNEL));
         roMetadataObj.put(Constants.NUMBER_OF_DATASETS, noOfFiles + "");
         roMetadataObj.put(Constants.MAX_DATA_SIZE, maxSize + "");
         roMetadataObj.put(Constants.MAX_COLLECTION_DEPTH, 0 +"");
@@ -516,6 +519,8 @@ public class SEADClientService {
         aggregation.put(Constants.CREATOR, metadataObject.getString(Constants.CREATOR));
         aggregation.put(Constants.ABSTRACT, metadataObject.getString(Constants.ABSTRACT));
         aggregation.put(Constants.PUBLISHING_PROJECT, metadataObject.getString(Constants.PUBLISHING_PROJECT));
+        aggregation.put(Constants.PUBLISHING_PROJECT_NAME, metadataObject.getString(Constants.PUBLISHING_PROJECT));
+        aggregation.put(Constants.CHANNEL, metadataObject.getString(Constants.CHANNEL));
         //aggregation.put(Constants.PUBLISHING_PROJECT_NAME, "DIBBS");
         roObject.put("Aggregation", aggregation);
 
