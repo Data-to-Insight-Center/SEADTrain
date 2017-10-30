@@ -177,6 +177,7 @@ public class SEADClientService {
         //aggregation.put(Constants.LABEL, metadataObject.getString("TITLE"));
         aggregation.put(Constants.CREATOR, metadataObject.getString("CREATOR"));
         aggregation.put(Constants.ABSTRACT, metadataObject.getString("ABSTRACT"));
+        aggregation.put(Constants.CHANNEL, metadataObject.getString("CHANNEL"));
         aggregation.put(Constants.PUBLISHING_PROJECT, "DIBBS");
         //aggregation.put(Constants.PUBLISHING_PROJECT_NAME, "DIBBS");
         roObject.put("Aggregation", aggregation);
@@ -220,6 +221,7 @@ public class SEADClientService {
         describes.put(Constants.LABEL, metadataObject.getString("TITLE"));
         describes.put(Constants.CREATOR, metadataObject.getString("CREATOR"));
         describes.put(Constants.ABSTRACT, metadataObject.getString("ABSTRACT"));
+        describes.put(Constants.CHANNEL, metadataObject.getString("CHANNEL"));
 
         String fileIdentifier = "file-" + UUID.randomUUID().toString();
         describes.put(Constants.HAS_PART, new JSONArray().put(fileIdentifier));
@@ -586,6 +588,7 @@ public class SEADClientService {
         describes.put(Constants.LABEL, metadataObject.getString(Constants.TITLE));
         describes.put(Constants.CREATOR, metadataObject.getString(Constants.CREATOR));
         describes.put(Constants.ABSTRACT, metadataObject.getString(Constants.ABSTRACT));
+        describes.put(Constants.CHANNEL, metadataObject.getString(Constants.CHANNEL));
 
         JSONArray aggregates = new JSONArray();
         JSONArray fileObjects = metadataObject.getJSONArray(FILES);

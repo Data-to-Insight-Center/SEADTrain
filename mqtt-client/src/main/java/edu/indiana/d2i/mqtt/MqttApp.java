@@ -38,6 +38,7 @@ public class MqttApp {
     	          {
     	        	  MqttClientDaily.main(args);
     	        	  
+    	        	  // MAPS sensor data
     	        	  File sen_data_file = new File("sensordata");
     	    		  if (!sen_data_file.exists()) {
     	    			  sen_data_file.mkdir();	                
@@ -46,7 +47,18 @@ public class MqttApp {
     	    		  if (!pub_sen_data_file.exists()) {
     	    			  pub_sen_data_file.mkdir();	                
     	    		  }
-    	    			
+    	    		  
+    	    		  // AIRBOX_COPY sensor data
+    	    		  File air_sen_data_file = new File("airbox_copy_sensordata");
+    	    		  if (!air_sen_data_file.exists()) {
+    	    			  air_sen_data_file.mkdir();	                
+    	    		  }
+    	    		  File air_pub_sen_data_file = new File("publish_airbox_copy_sensordata");
+    	    		  if (!air_pub_sen_data_file.exists()) {
+    	    			  air_pub_sen_data_file.mkdir();	                
+    	    		  }
+    	    		  
+    	    		  // MAPS sensor data
     	    		  Date date = DateUtils.addDays(new Date(), -1);
     	    		  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     	    	      String yest_date = sdf.format(date);
@@ -57,6 +69,19 @@ public class MqttApp {
     	    		  if (!last_pub_sen_data_file.exists()) {
     	    			  try {
     	    				  FileUtils.copyDirectoryToDirectory(srcDir, destDir);
+    	    			  } catch (IOException e) {
+    	    				  // TODO Auto-generated catch block
+    	    				  logger.error("Particular day folder not copied successfully: ", e);
+    	    			  }             
+    	    		  }
+    	    		  
+    	    		  // AIRBOX_COPY sensor data
+    	    		  File last_air_pub_sen_data_file = new File("publish_airbox_copy_sensordata/" + yest_date);			
+    	    		  File air_srcDir = new File("airbox_copy_sensordata/" + yest_date);
+    	    		  File air_destDir = new File("publish_airbox_copy_sensordata");
+    	    		  if (!last_air_pub_sen_data_file.exists()) {
+    	    			  try {
+    	    				  FileUtils.copyDirectoryToDirectory(air_srcDir, air_destDir);
     	    			  } catch (IOException e) {
     	    				  // TODO Auto-generated catch block
     	    				  logger.error("Particular day folder not copied successfully: ", e);
