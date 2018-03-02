@@ -521,7 +521,12 @@ public class SEADClientService {
         aggregation.put(Constants.CREATOR, metadataObject.getString(Constants.CREATOR));
         aggregation.put(Constants.ABSTRACT, metadataObject.getString(Constants.ABSTRACT));
         aggregation.put(Constants.PUBLISHING_PROJECT, metadataObject.getString(Constants.PUBLISHING_PROJECT));
-        aggregation.put(Constants.PUBLISHING_PROJECT_NAME, metadataObject.getString(Constants.PUBLISHING_PROJECT));
+        if(metadataObject.getString(Constants.PUBLISHING_PROJECT).equals("airbox")){
+            aggregation.put(Constants.PUBLISHING_PROJECT_NAME, metadataObject.getString(Constants.CHANNEL));
+        }else{
+            aggregation.put(Constants.PUBLISHING_PROJECT_NAME, metadataObject.getString(Constants.PUBLISHING_PROJECT));
+        }
+
         aggregation.put(Constants.CHANNEL, metadataObject.getString(Constants.CHANNEL));
         //aggregation.put(Constants.PUBLISHING_PROJECT_NAME, "DIBBS");
         roObject.put("Aggregation", aggregation);
