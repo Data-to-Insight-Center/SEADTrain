@@ -24,7 +24,7 @@ The number of devices transmitting varies  between 700 and 1000 per day.
 
 ### Data description
 
-Below wiki page contain more dateil about the data description.
+More details about the data description can be found in the wiki page below.
 
 https://github.com/Data-to-Insight-Center/SEADTrain/wiki/SEADTrain-Data-Description
 
