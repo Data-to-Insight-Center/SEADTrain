@@ -1,12 +1,13 @@
 # SEADTrain Data
 
-## Air Sensing: Data Structure and Quality
 
-### Introduction
+## Introduction
 The dataset consists of air sensor data collected from two types of devices (two “channels” of data): Micro Air Pollution Sensor (MAPS channel) and EdiGreen Airbox (Airbox_copy channel).  The data are collected from devices that are installed mostly in Taiwan by the Airbox Project - a collaboration between Taiwanese academic institutions, computer industry and Taipei city government.  
 
 ## Contributing
 The data used in this training exercise is made available through a collaboration of the Pacfic Rim Applications and Grid Middleware Assembly PRAGMA (National Science Foundation award #1234983) and used with permission by the National Center for High Performance Computing in Hsinchu City, Taiwan. 
+
+## Air Sensing: Data Structure and Quality
 
 ### MAPS channel information
 Micro Air Pollution Sensing System (MAPS) device is designed for academia and research purposes (Chen, 2017). Its sensors and components can be easily extended and exchanged.
