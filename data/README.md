@@ -1,6 +1,6 @@
 # SEADTrain Data
 
-## Taiwan Air Sensing: Data Structure and Quality
+## Air Sensing: Data Structure and Quality
 
 ### Introduction
 The dataset consists of air sensor data collected from devices that are installed mostly in Taiwan by the Airbox Project - a collaboration between Taiwanese academic institutions, computer industry and Taipei city government with the goal to collect measurements of fine particles in the air.
