@@ -4,8 +4,10 @@
 ## Introduction
 The dataset consists of air sensor data collected from two types of devices (two “channels” of data): Micro Air Pollution Sensor (MAPS channel) and EdiGreen Airbox (Airbox_copy channel).  The data are collected from devices that are installed mostly in Taiwan by the Airbox Project - a collaboration between Taiwanese academic institutions, computer industry and Taipei city government.  
 
+Note: The data here are permitted for research use only; use is by academic institutions and non-profit organizations only. 
+
 ## Contributing
-The data used in this training exercise is made available through a collaboration of the Pacfic Rim Applications and Grid Middleware Assembly PRAGMA (National Science Foundation award #1234983) and used with permission by the National Center for High Performance Computing in Hsinchu City, Taiwan. 
+The data used in this training exercise is made available through a collaboration of the Pacfic Rim Applications and Grid Middleware Assembly PRAGMA (National Science Foundation award #1234983), the Center of Excellence for Cyber Enablement of Applications (MOST 104-2923-E-492 -002 -MY3), and Academia Sinica (MOST 105-2221-E-001-016-MY3).  Special thanks to the Edimax Inc., the LASS community for their support, technical advice and administrative assistance.
 
 ## Air Sensing: Data Structure and Quality
 
