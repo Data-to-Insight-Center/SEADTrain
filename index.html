@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Discovery interface for PID'ified airbox data in GitHub</title>
+    <meta name="description" content="A search module for PID'ified airbox data in GitHub">
+	
+    <script type="text/javascript" src="js/jquery-min.js"></script>
+    <script type="text/javascript" src="js/moment-min.js"></script>
+    <script type="text/javascript" src="js/daterangepicker.js"></script>
+    <script type="text/javascript" src="js/filter.js" ></script>
+    <script type="text/javascript" src="js/jquery.tmpl.js"></script>
+    <script type="text/javascript" src="js/pid.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.3.0/fuse.min.js"></script>
+    <script type="text/javascript" src="js/jquery.js"></script>
+
+    <link rel="stylesheet" media="all" href="css/pid.css">
+    <link rel="stylesheet" media="all" href="css/daterangepicker.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+	
+	
+	<script type="text/javascript">
+	$.noConflict();	
+		
+	$(document).ready(function($){
+	
+	setTimeout(function() {
+	if (bool_pagination){
+		pagination();
+		}}, 800);
+	});
+
+	function pagination(){
+		//how much items per page to show
+		var show_per_page = 20;
+		//getting the amount of elements inside content div
+		var number_of_items = $('#CRUDthisTable').children().size();
+		//calculate the number of pages we are going to have
+		var number_of_pages = Math.ceil(number_of_items/show_per_page);
+
+		//set the value of our hidden input fields
+		$('#current_page').val(0);
+		$('#show_per_page').val(show_per_page);
+
+		//now when we got all we need for the navigation let's make it '
+
+		/*
+		what are we going to have in the navigation?
+			- link to previous page
+			- links to specific pages
+			- link to next page
+		*/
+		var navigation_html = '<a class="previous_link" href="javascript:previous();">Prev</a>';
+		var current_link = 0;
+		while(number_of_pages > current_link){
+			navigation_html += '<a class="page_link" href="javascript:go_to_page(' + current_link +')" longdesc="' + current_link +'">'+ (current_link + 1) +'</a>';
+			current_link++;
+		}
+		navigation_html += '<a class="next_link" href="javascript:next();">Next</a>';
+
+		$('#page_navigation').html(navigation_html);
+
+		//add active_page class to the first page link
+		$('#page_navigation .page_link:first').addClass('active_page');
+
+		//hide all the elements inside content div
+		$('#CRUDthisTable').children().css('display', 'none');
+
+		//and show the first n (show_per_page) elements
+		$('#CRUDthisTable').children().slice(0, show_per_page).css('display', 'block');
+	}
+
+	function previous(){
+
+		new_page = parseInt($('#current_page').val()) - 1;
+		//if there is an item before the current active link run the function
+		if($('.active_page').prev('.page_link').length==true){
+			go_to_page(new_page);
+		}
+	}
+
+	function next(){
+		new_page = parseInt($('#current_page').val()) + 1;
+		//if there is an item after the current active link run the function
+		if($('.active_page').next('.page_link').length==true){
+			go_to_page(new_page);
+		}
+	}
+
+	function go_to_page(page_num){
+		//get the number of items shown per page
+		var show_per_page = parseInt($('#show_per_page').val());
+
+		//get the element number where to start the slice from
+		start_from = page_num * show_per_page;
+
+		//get the element number where to end the slice
+		end_on = start_from + show_per_page;
+
+		//hide all children elements of content div, get specific items and show them
+		$('#CRUDthisTable').children().css('display', 'none').slice(start_from, end_on).css('display', 'block');
+
+		/*get the page link that has longdesc attribute of the current page and add active_page class to it
+		and remove that class from previously active page link*/
+		$('.page_link[longdesc=' + page_num +']').addClass('active_page').siblings('.active_page').removeClass('active_page');
+
+		//update the current page input field
+		$('#current_page').val(page_num);
+	}
+
+	// abstract may contain line breaks which should be converted into html br tags
+	function fixAbstract(abstract) {
+		return abstract.replace(new RegExp("\n", 'g'), "</br>");
+	}
+</script>
+</head>
+
+<body>
+	<div  style="width:1000px;margin: 0 auto;" >
+    <div style="display : inline-block; padding: 15px 0px 15px 0px;width:100%;">
+        <div align="left">
+            <span class="helper"></span>
+            <a href="https://www.indiana.edu/" target="_blank"><img align="left" style="width: 273px;height:91px" src="images/iu-logo.png" alt="Indiana University"></a>
+        </div>
+        <div align="right">
+            <span class="helper"></span>
+            <a href="http://d2i.indiana.edu/" target="_blank"><img align="right" style="width: 349px;height:66px" src="images/d2i.png" alt="Data to Insight Center"></a>
+        </div>
+    </div>
+    <div>
+        <!--<div style="float: right; font-size:14px;">-->
+            <!--<a href="/landing-page/home.html">IU SEAD Cloud</a>-->
+        <!--</div>-->
+        <!--<div style="float: right; font-size:14px;padding:0px 20px 0px 0px;"><a href="#"> | </a></div>-->
+        <div style="float: right; font-size:14px;padding:0px 0px 0px 0px;">
+            <a href="https://github.com/Data-to-Insight-Center/SEADTrain" target="_blank">Learn more about SEADTrain Project</a>
+        </div>
+    </div>
+    <div style="width:100%;">
+        <div id="nav" style="margin-bottom:20px; height:100%">
+            <h4 style="color:#3b5998">Search By:</h4>
+            <div id="filter"></div>
+        </div>
+        <div id="middle"></div>
+
+        <div id="section">
+            <h2 style="color:#3b5998;padding:10px 0px 0px 0px;">SEADTrain PID'ified Airbox Data</h2>
+            <p style="font-size: medium"><i>Discover Airbox Data Published in GitHub</i></p>
+            <!--<h3 style="color:#3b5998">Search Results:</h3>-->
+            <div id="page_navigation" style="float:right;padding:10px 0px 15px 0px;"></div>
+            <input type="hidden" id="current_page"/>
+            <input type="hidden" id="show_per_page"/>
+            <div id="CRUDthisTable" class="mediumTable"></div>
+            <br/>
+        </div>
+    </div>
+
+    <div style="width:100%;">
+        <div id="footer">
+            <p>SEADTrain project, The data used in this training exercise is made available in part through funding from the National Science Foundation under award #1234983. All software is licensed under an Apache 2.0 license</p>
+        </div>
+    </div>
+</div>
+</body>
+	
+	
+	
+<script type="text/javascript">
+      function sendToServer(data){
+		bool_pagination = false;		
+		  
+		var r = new XMLHttpRequest();
+		r.open('GET', 'data/metadata.json', true);
+		r.onreadystatechange = function () {
+		if (r.readyState != 4 || r.status != 200) return;			
+			
+			search_arr = JSON.parse(r.responseText);
+			var search_data = [];
+			for(var i = 0; i < search_arr.length; i++) {
+				var title = search_arr[i].Title;
+				var creator = search_arr[i].Creator;
+				var publisher = search_arr[i].Publisher;
+				var publication_date = search_arr[i]["Publication Date"];
+
+				for (key in search_arr[i]["Registered Clean Data PIDs"]){
+					for (clean_key in search_arr[i]["Registered Clean Data PIDs"][key]){
+						var pid = search_arr[i]["Registered Clean Data PIDs"][key][clean_key];
+						var obj_type = clean_key;
+						var final_title = title + " as " + obj_type;
+						var data_citation = creator + " (2018). " + final_title + ". " + publisher + ". " + pid
+
+						search_data.push({"CreatorName":creator, "CreationDate":publication_date, "Publisher":publisher, "PublicationDate":publication_date, "Title":final_title, "PersistentIdentifier":pid, "DataCitation":data_citation})
+					}
+
+				}
+
+				for (raw in search_arr[i]["Registered Raw Data PIDs"]){
+					for (raw_data in search_arr[i]["Registered Raw Data PIDs"][raw]){
+						var pid = search_arr[i]["Registered Raw Data PIDs"][raw][raw_data];
+						var obj_type = raw_data;
+						var type = raw;
+
+						var final_title = title + " as " + obj_type;
+						var data_citation = creator + " (2018). " + final_title + ". " + publisher + ". " + pid
+
+						if (obj_type == "December" || obj_type == "November" || obj_type == "October" || obj_type == "September" || obj_type == "August" || obj_type == "July" || obj_type == "June" || obj_type == "May" || obj_type == "January") {
+							for (day in pid){
+								var new_pid = pid[day];
+								var cre_date = day;
+
+								var new_type = raw;
+
+								var lastIndex = new_type.lastIndexOf(" ");
+								//new_type = new_type.substring(0, lastIndex);
+
+								var new_final_title = title + " as " + new_type.substring(0, lastIndex) + " Daily Data CSV file";
+								var new_data_citation = creator + " (2018). " + new_final_title + ". " + publisher + ". " + new_pid
+
+								search_data.push({"CreatorName":creator, "CreationDate":cre_date, "Publisher":publisher, "PublicationDate":publication_date, "Title":new_final_title, "PersistentIdentifier":new_pid, "DataCitation":new_data_citation})
+							}
+						}else{
+							search_data.push({"CreatorName":creator, "CreationDate":publication_date, "Publisher":publisher, "PublicationDate":publication_date, "Title":final_title, "PersistentIdentifier":pid, "DataCitation":data_citation})
+
+						}
+					}
+				}
+
+			}
+			
+			var filter_string = "";
+			
+			if (data.hasOwnProperty('creator_name')){
+				search_creator = data.creator_name.values[0].value;
+				filter_string += search_creator;
+				key_set = ['CreatorName'];
+			}else{
+				search_creator = "";
+				filter_string += "";
+			}if (data.hasOwnProperty('search_content')){
+				search_string = data.search_content.values[0].value;
+				filter_string += search_string;
+				key_set = ['Title', 'CreatorName', 'DataCitation', 'Publisher', 'PersistentIdentifier'];
+			}else{
+				search_string = "";
+				filter_string += "";
+			}if (data.hasOwnProperty('title')){
+				search_title = data.title.values[0].value;
+				filter_string += search_title;
+				key_set = ['Title']
+			}else{
+				search_title = "";
+				filter_string += "";
+			}if (data.hasOwnProperty('date_range')){
+				search_date_range = data.date_range.values[0].value;
+				search_start_date = moment(search_date_range.split("-")[0].trim()).format("YYYY-MM-DD");				
+				search_end_date =  moment(search_date_range.split("-")[1].trim()).format("YYYY-MM-DD");
+				key_set = ['CreationDate']
+				filter_string += search_start_date;
+				filter_string += " ";
+				filter_string += search_end_date;
+			}else{
+				search_date_range = "";
+				search_start_date = "";
+				search_end_date = "";
+				filter_string += "";
+			}
+			
+			if (filter_string == "")
+			{
+				window.location.reload(true);
+			}
+			
+			var options = {
+							keys: key_set,
+							shouldSort: true,
+							threshold: 0.6,
+							location: 0,
+							distance: 100,
+							maxPatternLength: 32,
+							minMatchCharLength: 1
+						  };
+			var f_request = new Fuse(search_data, options);
+        	var response = f_request.search(filter_string);
+			
+			new_arr = response;
+		    $("#CRUDthisTable").empty();
+
+		if(response.length != 0){
+			var new_ros = [];
+			
+			for(var i = 0; i < new_arr.length; i++) {
+				var title = new_arr[i].Title;
+				var creator = new_arr[i].CreatorName;
+				var publisher = new_arr[i].Publisher;
+				var publication_date = new_arr[i].PublicationDate;
+				var pid = new_arr[i].PersistentIdentifier;
+				var data_citation = new_arr[i].DataCitation;
+				var creation_date = new_arr[i].CreationDate;				
+
+				new_ros.push({"CreatorName":creator, "CreationDate":creation_date, "Publisher":publisher, "PublicationDate":publication_date, "Title":title, "PersistentIdentifier":pid, "DataCitation":data_citation})
+				
+
+			}
+			$("#viewRowTemplate").tmpl(new_ros).appendTo("#CRUDthisTable");
+
+		}else{
+	$("#viewRowTemplateNull").tmpl(new_ros).appendTo("#CRUDthisTable");
+	}
+	pagination();
+	};
+		  
+	r.send();
+		
+}
+	options = {
+		title: 'SEADTrain Search Filter',
+		dateFormat: this.dateFormat,
+		searchClickedCallback: sendToServer,
+		filterParameters: [
+			{type: 'text', attributeName: 'search_content', name: 'Search Across All Fields', placeholder: 'search across all fields', id: 'MAPS', autocomplete: 'on'},
+			{type: 'text', attributeName: 'creator_name', name: 'Creator Name', placeholder: 'type creator name', id: 'Airbox Project', autocomplete: 'on'},
+			{type: 'date-range', attributeName: 'date_range', name: 'Creation Date Range'},
+			{type: 'text', attributeName: 'title', name: 'Title', placeholder: 'type title', id: 'Entire Clean Airbox Zip File', autocomplete: 'on'},
+		]
+	};
+$('#filter').bootstrapFilter(options);
+</script>
+	
+	
+<script id="viewRowTemplate" type="text/x-jquery-tmpl">
+	<ul>
+		<li>
+			<table>
+				<tr valign="top" style="line-height:1.5;">
+					<th style="width: 135px">Title</th>
+					<td>{{html Title}}</td>
+				</tr>
+				<tr valign="top" style="line-height:1.4;">
+					<th style="width: 135px">Creator</th>
+					<td>{{html CreatorName}}</td>
+				</tr>
+				<tr valign="top" style="line-height:1.4;">
+					<th style="width: 135px">Creation Date</th>
+					<td>{{html CreationDate}}</td>
+				</tr>
+				<tr valign="top" style="line-height:1.4;">
+					<th style="width: 135px">Publisher</th>
+					<td>{{html Publisher}}</td>
+				</tr>
+				<tr valign="top" style="line-height:1.5;">
+					<th style="width: 135px">Publication Date</th>
+					<td>{{html PublicationDate}}</td>
+				</tr>
+				<tr valign="top" style="line-height:1.5;">
+					<th style="width: 135px">PID</th>
+					<td><a href="{{html PersistentIdentifier}}" target="_blank">{{html PersistentIdentifier}}</a></td>
+				</tr>
+				<tr valign="top" style="line-height:1.5;">
+					<th style="width: 135px">Data Citation</th>
+					<td>{{html DataCitation}}</td>
+				</tr>
+			</table>
+		</li>
+	</ul>
+</script>
+<script id="viewRowTemplateNull" type="text/x-jquery-tmpl">
+	<ul>
+		<li style="width:600px;color:red;">
+			No Results Found.
+		</li>
+	</ul>
+	</br>
+</script>
+
+
+</html>
