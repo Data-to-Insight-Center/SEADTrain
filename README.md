@@ -10,6 +10,9 @@ This pilot project focuses on the following activity:
 * **Training and Outreach events**
 * **Evaluation**: Carry out an evaluation of the pilot including study of access control needed to protect the datasets; the access control issues with individual student computers; tools in place for tracking student activity and student signup.
 
+Find the SEADTrain PID'ified Airbox Data Discovery User Interface below:<br>
+https://data-to-insight-center.github.io/SEADTrain/
+
 
 ## Contributing
 The materials were developed by the Data To Insight Center of Indiana University and are available at https://figshare.com/articles/SEADTrain_Data_Analysis/6873800 under a Creative Commons 4.0 license.  The data used in this training exercise is made available in part through funding from the National Science Foundation under award #1234983.  The Azure resources are funded through an award from Microsoft for Azure credits.  All software is licensed under an Apache 2.0 license.
