@@ -32,3 +32,9 @@ More details about the data description can be found in the wiki page below.
 
 https://github.com/Data-to-Insight-Center/SEADTrain/wiki/SEADTrain-Data-Description
 
+### Discovery User Interface
+
+Find the fully PID'ified Airbox data discovery user interface below.
+
+https://data-to-insight-center.github.io/SEADTrain/
+
