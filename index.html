@@ -353,10 +353,11 @@
 		dateFormat: this.dateFormat,
 		searchClickedCallback: sendToServer,
 		filterParameters: [
-			{type: 'text', attributeName: 'search_content', name: 'Search Across All Fields', placeholder: 'search across all fields', id: 'MAPS', autocomplete: 'on'},
+			{type: 'text', attributeName: 'title', name: 'Title', placeholder: 'type title', id: 'Entire Clean Airbox Zip File', autocomplete: 'on'},			
 			{type: 'text', attributeName: 'creator_name', name: 'Creator Name', placeholder: 'type creator name', id: 'Airbox Project', autocomplete: 'on'},
 			{type: 'date-range', attributeName: 'date_range', name: 'Creation Date Range'},
-			{type: 'text', attributeName: 'title', name: 'Title', placeholder: 'type title', id: 'Entire Clean Airbox Zip File', autocomplete: 'on'},
+			{type: 'text', attributeName: 'search_content', name: 'Search Across All Fields', placeholder: 'search across all fields', id: 'MAPS', autocomplete: 'on'},
+			
 		]
 	};
 $('#filter').bootstrapFilter(options);
